@@ -1,0 +1,113 @@
+MEDICAL-SHOP/
+├── app/                                  # Routing & API Layer ONLY (Zero business logic)
+│   ├── (auth)/                           # Public Auth Route Group (URLs: /signin, /signup)
+│   │   ├── signin/
+│   │   │   └── page.tsx
+│   │   └── signup/
+│   │       └── page.tsx
+│   ├── (dashboard)/                      # Protected App Route Group (Shared Navbar/Sidebar)
+│   │   ├── layout.tsx                    # Wraps dashboard pages with Navbar & Auth guard
+│   │   ├── dashboard/
+│   │   │   └── page.tsx                  # Consolidated shop-dashboard & my-shop overview
+│   │   ├── billing/
+│   │   │   └── page.tsx                  # Dedicated POS / Billing view
+│   │   ├── inventory/
+│   │   │   └── page.tsx                  # Medicines / Inventory management view
+│   │   ├── invoices/
+│   │   │   ├── page.tsx                  # Invoices list (Replaces duplicate /invoice & InvoicesTab)
+│   │   │   └── [id]/
+│   │   │       └── page.tsx              # Single Invoice detail & print view
+│   │   └── profile/
+│   │       └── page.tsx                  # User & Shop profile settings
+│   ├── api/                              # Scalable REST API Layer (Protected via middleware.ts)
+│   │   ├── auth/
+│   │   │   ├── signin/route.ts
+│   │   │   ├── signout/route.ts
+│   │   │   └── signup/route.ts
+│   │   ├── invoices/                     # Moved out of /api/authorized/
+│   │   │   ├── route.ts                  # GET (list), POST (create)
+│   │   │   └── [id]/route.ts             # GET (single), DELETE
+│   │   ├── medicines/
+│   │   │   ├── route.ts                  # GET (list), POST (create)
+│   │   │   └── [id]/route.ts             # GET, PATCH (update), DELETE
+│   │   ├── shops/                        # Standardized from /my-shop
+│   │   │   └── route.ts                  # GET, POST, PATCH, DELETE
+│   │   └── users/                        # Standardized from /my-profile
+│   │       └── profile/route.ts          # GET, PATCH
+│   ├── error.tsx                         # Global React Error Boundary for UI crashes
+│   ├── not-found.tsx                     # 404 Page
+│   ├── layout.tsx                        # Root HTML/Body & Root Providers
+│   ├── page.tsx                          # Landing / Redirect page
+│   └── globals.css                       # Global Tailwind directives
+│
+├── components/                           # Modular UI Layer (Extracted from app/)
+│   ├── providers/
+│   │   └── AuthProvider.tsx              # Moved from app/components/AuthProvider.tsx
+│   ├── layout/
+│   │   └── Navbar.tsx                    # Moved from app/components/Navbar.tsx
+│   ├── ui/                               # Reusable Atomic UI Primitives
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Table.tsx
+│   │   └── Spinner.tsx
+│   └── features/                         # Domain-Specific UI Modules (Moved from app/shop-dashboard/)
+│       ├── billing/
+│       │   └── BillingPosForm.tsx        # Refactored from BillingTab.tsx
+│       ├── invoices/
+│       │   ├── InvoicesTable.tsx         # Refactored from InvoicesTab.tsx
+│       │   └── InvoiceReceipt.tsx        # Moved from app/shop-dashboard/InvoiceReceipt.tsx
+│       ├── inventory/
+│       │   └── MedicinesTable.tsx        # Refactored from MedicinesTab.tsx
+│       └── shop/
+│           └── ShopSettingsForm.tsx      # Extracted from my-shop/page.tsx
+│
+├── config/                               # Environment & App Configuration Layer
+│   ├── env.ts                            # Strict runtime validation for process.env
+│   └── constants.ts                      # App-wide constants (pagination limits, cookie names, routes)
+│
+├── hooks/                                # Client Custom Hooks (Bridges UI & API/Store)
+│   ├── useMedicines.ts                   # Fetching, filtering & mutating inventory
+│   ├── useInvoices.ts                    # Fetching & creating invoices
+│   └── useDebounce.ts                    # Reusable search debounce hook
+│
+├── lib/                                  # Infrastructure & Core Utilities (Server/Client helpers)
+│   ├── api/
+│   │   ├── api-client.ts                 # Centralized frontend fetch wrapper with error parsing
+│   │   ├── api-handler.ts                # Backend route wrapper (catches errors, formats JSON)
+│   │   └── app-error.ts                  # Custom operational error class (AppError)
+│   ├── auth/
+│   │   ├── password.util.ts              # Renamed from bcrypt.service.ts
+│   │   ├── jwt.util.ts                   # Renamed from jwt.service.ts
+│   │   └── cookies.util.ts               # Renamed from cookies.ts
+│   ├── db/
+│   │   ├── client.ts                     # Renamed from db.ts (Database connection pool)
+│   │   └── db.util.ts                    # Renamed from db-utils.ts
+│   └── security/
+│       └── rate-limit.util.ts            # Renamed from ratelimit.ts
+│
+├── services/                             # Pure Business Logic & Data Access Layer (Server-only)
+│   ├── invoice.service.ts                # Merges invoice-create, invoice-find, & invoice-helpers
+│   ├── medicine.service.ts               # Merges medicine-create, delete, find, & update
+│   ├── shop.service.ts                   # Merges shop-create, delete, get, & update
+│   └── user.service.ts                   # Merges user-create, find, profile, & update
+│
+├── store/                                # Global Client State Management (Zustand)
+│   ├── useAuthStore.ts                   # User session & shop context state
+│   └── useBillingStore.ts                # Active cart items, discounts, & totals for POS billing
+│
+├── types/                                # Centralized TypeScript Definitions
+│   ├── api.types.ts                      # Standardized API response & pagination wrappers
+│   ├── db.types.ts                       # Renamed from db.ts (Database row/query types)
+│   ├── invoice.types.ts                  # Renamed from invoice-types.ts
+│   ├── medicine.types.ts                 # Renamed from medicine-types.ts
+│   ├── shop.types.ts                     # Renamed from shop-types.ts
+│   └── user.types.ts                     # Renamed from user-types.ts (interfaces.ts merged & deleted)
+│
+├── scripts/                              # Standalone CLI & Maintenance Scripts
+│   └── migrate.ts                        # Single source of truth (lib/migrate.ts deleted)
+│
+├── middleware.ts                         # Edge route & API authentication guard
+├── .env.example                          # Template of required environment variables
+├── .env.local                            # Local secrets (gitignored)
+└── README.md                             # Complete architectural & onboarding documentation
